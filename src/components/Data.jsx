@@ -37,5 +37,38 @@ const Price = styled.p`
 `;
 
 export default function Data() {
-  return <div>Data</div>;
+  // 이따가 users 추가하고 삭제하는거 진행을 도와줄 state
+  const [users, setUsers] = useState([]);
+  // db의 users 컬렉션을 가져옴
+  const usersCollectionRef = collection(firestore, "편의점음료수");
+
+  // 시작될때 한번만 실행
+  useEffect(() => {
+    // 비동기로 데이터 받을준비
+    const getUsers = async () => {
+      // getDocs로 컬렉션안에 데이터 가져오기
+      const data = await getDocs(usersCollectionRef);
+      // users에 data안의 자료 추가. 객체에 id 덮어씌우는거
+      setUsers(data.docs.map((doc) => ({ ...doc.data(), id: doc.id })));
+    };
+    getUsers();
+  }, []);
+
+  const showUsers = users.map((value) => (
+    <Container>
+      <Product>
+        <FlexGrow>
+          <Title>{value.이름}</Title>
+          <Price> 칼로리 : {value.칼로리} kcal</Price>
+          <Date>유통기한 : {value.유통기한}</Date>
+        </FlexGrow>
+      </Product>
+    </Container>
+  ));
+
+  return (
+    <>
+      <div>{showUsers}</div>
+    </>
+  );
 }
